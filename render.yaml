@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: devchat-frontend
+    env: node
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npm start"
+    envVars:
+      - key: CI
+        value: "true"
+      - key: CHOKIDAR_USEPOLLING
+        value: "true"
+      - key: WDS_SOCKET_PORT
+        value: "0"
+    healthCheckPath: /
+    
+  - type: web
+    name: devchat-backend
+    env: node
+    buildCommand: "cd backend && npm install"
+    startCommand: "cd backend && npm start"
+    envVars:
+      - key: MONGO_URI
+        value: mongodb+srv://user:pass@cluster.mongodb.net/devchat_pro
+    healthCheckPath: /api/health
