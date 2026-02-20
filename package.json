@@ -1,7 +1,24 @@
 {
+  "name": "devchat",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "scripts": {
+    "start": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
   "dependencies": {
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
     "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
   }
 }
