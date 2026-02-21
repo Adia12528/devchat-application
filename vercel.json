@@ -1,0 +1,16 @@
+{
+  "buildCommand": "cd frontend && npm run build",
+  "Framework": "react",
+  "functions": {
+    "api/**/*.js": {
+      "memory": 512,
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "NODE_OPTIONS": "--max-old-space-size=2048"
+  },
+  "public": true,
+  "installCommand": "npm install",
+  "outputDirectory": "frontend/build"
+}

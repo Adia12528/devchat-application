@@ -1,0 +1,11 @@
+node_modules
+.git
+.gitignore
+README.md
+HARDWARE_REQUIREMENTS.md
+*.log
+.DS_Store
+backend/
+events/
+models/
+VisionDriveAI*

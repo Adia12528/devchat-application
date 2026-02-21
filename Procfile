@@ -1,1 +1,1 @@
-web: cd frontend && NODE_OPTIONS="--max-old-space-size=256" npm ci && NODE_OPTIONS="--max-old-space-size=256" npm run build && npm install -g serve && serve -s build -l 3000
+web: cd frontend && npm run build && npm install -g serve && serve -s build -l 3000
