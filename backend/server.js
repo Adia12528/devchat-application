@@ -117,3 +117,5 @@ process.on('SIGTERM', () => {
         });
     });
 });
+
+//deployment done with render.com, added env variables for production and development, added health check endpoint, added error handling, and implemented graceful shutdown.
