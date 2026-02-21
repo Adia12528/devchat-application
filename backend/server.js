@@ -3,18 +3,34 @@ const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
 require('dotenv').config(); // Load variables from a .env file locally
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const isProd = process.env.NODE_ENV === 'production';
+
+// Security middleware
+app.use(helmet());
+
+// Compression middleware
+app.use(compression());
+
+// CORS configuration
+const corsOptions = {
+  origin: isProd ? process.env.FRONTEND_URL : '*',
+  methods: ['GET', 'POST'],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
 
 const server = http.createServer(app);
 const io = new Server(server, { 
-    cors: { 
-        origin: "*", // In production, replace with your specific frontend URL
-        methods: ["GET", "POST"] 
-    } 
+    cors: corsOptions,
+    transports: ['websocket', 'polling'],
+    pingInterval: 25000,
+    pingTimeout: 60000
 });
 
 // Use the PORT provided by the hosting service (Render) or 5000 locally
@@ -69,4 +85,35 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(PORT, () => console.log(`🚀 Server live on port ${PORT}`));
+server.listen(PORT, () => {
+    console.log(`🚀 Server live on port ${PORT}`);
+    console.log(`📝 Environment: ${isProd ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ error: 'Endpoint not found' });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({ error: isProd ? 'Internal server error' : err.message });
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+        console.log('HTTP server closed');
+        mongoose.connection.close(false, () => {
+            console.log('MongoDB connection closed');
+            process.exit(0);
+        });
+    });
+});
